@@ -18,12 +18,12 @@
 
 ## Phase 3 - Docker Compose
 
-- [ ] 3.1 Dockerfiles
-- [ ] 3.2 docker-compose.yml + nginx
-- [ ] 3.3 Docker integration test
+- [x] 3.1 Dockerfiles
+- [x] 3.2 docker-compose.yml + nginx
+- [x] 3.3 Docker integration test
 
 ## Phase 4 - Polish
 
-- [ ] 4.1 Export support (.excalidraw / .png / .svg download)
-- [ ] 4.2 File search within workspace
-- [ ] 4.3 Move/copy files between workspaces
+- [x] 4.1 Export support (.excalidraw / .png / .svg download)
+- [x] 4.2 File search within workspace
+- [x] 4.3 Move/copy files between workspaces

@@ -9,3 +9,9 @@ task_id	commit	status	duration	notes
 2.3	278398c	done	3m	workspace view with file cards, import modal, new drawing
 2.4	cb148a7	done	4m	editor page with Excalidraw, auto-save debounced 1.5s, inline rename
 2.5	5739c0c	done	3m	frontend integration test 10/10 checks pass, build succeeds
+3.1	1b9dbb2	done	5m	Dockerfiles + nginx.conf created, backend image builds, frontend uses ghcr nginx
+3.2	ee9df42	done	2m	docker-compose.yml created, Docker Hub rate limited for build verification
+4.1	77ba923	done	3m	export dropdown with .excalidraw, .svg, .png download
+4.2	f56491d	done	2m	search bar in WorkspaceView, client-side filter by name
+3.3	cbd1650	done	8m	docker compose verified - frontend+backend+nginx proxy, data persists
+4.3	64c83c4	done	4m	move/copy endpoints + workspace picker modal in FileCard
