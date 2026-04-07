@@ -1,6 +1,7 @@
 services:
   backend:
     build: ./backend
+    image: excalidraw-backend
     volumes:
       - excalidraw-data:/app/data
     expose:
@@ -9,6 +10,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: excalidraw-frontend
     ports:
       - "8080:8080"
     depends_on:
