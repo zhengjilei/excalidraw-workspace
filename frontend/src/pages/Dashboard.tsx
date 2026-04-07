@@ -28,7 +28,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#eee', padding: 32 }}>
+    <div style={{ height: '100vh', overflow: 'auto', background: '#1a1a1a', color: '#eee', padding: 32 }}>
       <div style={{ maxWidth: 960, margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h1 style={{ margin: 0, fontSize: 24 }}>Excalidraw Workspaces</h1>

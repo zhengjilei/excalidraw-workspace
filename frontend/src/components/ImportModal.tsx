@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import type { ImportResult } from '../api/types';
 import { uploadFiles } from '../api/client';
 
@@ -12,10 +12,17 @@ export default function ImportModal({ workspaceId, onClose, onDone }: Props) {
   const [dragging, setDragging] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dirInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback(async (files: File[]) => {
-    const valid = files.filter((f) => f.name.endsWith('.excalidraw') || f.name.endsWith('.json'));
-    if (valid.length === 0) return;
+    const valid = files.filter((f) =>
+      f.name.endsWith('.excalidraw') || f.name.endsWith('.json')
+    );
+    if (valid.length === 0) {
+      setResult({ imported: 0, skipped: 0, errors: ['No .excalidraw or .json files found'] });
+      return;
+    }
     setUploading(true);
     try {
       const res = await uploadFiles(workspaceId, valid);
@@ -28,11 +35,48 @@ export default function ImportModal({ workspaceId, onClose, onDone }: Props) {
     }
   }, [workspaceId, onDone]);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    handleFiles(files);
+
+    const allFiles: File[] = [];
+
+    // Handle dropped directories via DataTransferItem.webkitGetAsEntry
+    if (e.dataTransfer.items) {
+      const entries: FileSystemEntry[] = [];
+      for (let i = 0; i < e.dataTransfer.items.length; i++) {
+        const entry = e.dataTransfer.items[i].webkitGetAsEntry?.();
+        if (entry) entries.push(entry);
+      }
+
+      const readEntry = (entry: FileSystemEntry): Promise<File[]> => {
+        return new Promise((resolve) => {
+          if (entry.isFile) {
+            (entry as FileSystemFileEntry).file((f) => resolve([f]));
+          } else if (entry.isDirectory) {
+            const reader = (entry as FileSystemDirectoryEntry).createReader();
+            reader.readEntries(async (children) => {
+              const results = await Promise.all(children.map(readEntry));
+              resolve(results.flat());
+            });
+          } else {
+            resolve([]);
+          }
+        });
+      };
+
+      if (entries.length > 0) {
+        const results = await Promise.all(entries.map(readEntry));
+        allFiles.push(...results.flat());
+      }
+    }
+
+    if (allFiles.length === 0) {
+      // Fallback: regular file drop
+      allFiles.push(...Array.from(e.dataTransfer.files));
+    }
+
+    handleFiles(allFiles);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,12 +99,35 @@ export default function ImportModal({ workspaceId, onClose, onDone }: Props) {
                 <p>Uploading...</p>
               ) : (
                 <>
-                  <p style={{ margin: 0 }}>Drag & drop .excalidraw / .json files here</p>
-                  <p style={{ margin: '8px 0 0', fontSize: 13, color: '#999' }}>or</p>
-                  <label style={browseBtn}>
-                    Browse files
-                    <input type="file" multiple accept=".excalidraw,.json" style={{ display: 'none' }} onChange={handleFileInput} />
-                  </label>
+                  <p style={{ margin: 0 }}>Drag & drop files or folders here</p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#888' }}>
+                    Accepts .excalidraw and .json files
+                  </p>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
+                    <label style={browseBtn}>
+                      Browse files
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        style={{ display: 'none' }}
+                        onChange={handleFileInput}
+                      />
+                    </label>
+                    <label style={browseBtn}>
+                      Browse folder
+                      <input
+                        ref={dirInputRef}
+                        type="file"
+                        // @ts-expect-error webkitdirectory is non-standard but widely supported
+                        webkitdirectory=""
+                        directory=""
+                        multiple
+                        style={{ display: 'none' }}
+                        onChange={handleFileInput}
+                      />
+                    </label>
+                  </div>
                 </>
               )}
             </div>
@@ -94,7 +161,7 @@ const dropzone: React.CSSProperties = {
   textAlign: 'center', transition: 'border-color 0.2s',
 };
 const browseBtn: React.CSSProperties = {
-  display: 'inline-block', marginTop: 8, padding: '6px 14px', borderRadius: 4,
+  display: 'inline-block', padding: '6px 14px', borderRadius: 4,
   border: '1px solid #555', color: '#ccc', cursor: 'pointer', fontSize: 13,
 };
 const closeBtn: React.CSSProperties = {

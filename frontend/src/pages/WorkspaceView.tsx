@@ -39,7 +39,7 @@ export default function WorkspaceView() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#eee', padding: 32 }}>
+    <div style={{ height: '100vh', overflow: 'auto', background: '#1a1a1a', color: '#eee', padding: 32 }}>
       <div style={{ maxWidth: 960, margin: '0 auto' }}>
         <div style={{ marginBottom: 8, fontSize: 13 }}>
           <Link to="/" style={{ color: '#6965db', textDecoration: 'none' }}>Workspaces</Link>

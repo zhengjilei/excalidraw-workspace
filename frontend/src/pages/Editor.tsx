@@ -158,7 +158,7 @@ export default function Editor() {
           </div>
         </div>
       </div>
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         <Excalidraw
           initialData={{
             elements: (initialData.elements || []) as ExcalidrawElement[],
