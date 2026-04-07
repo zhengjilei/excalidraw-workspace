@@ -1,1 +1,6 @@
 task_id	commit	status	duration	notes
+1.1	7e48cd4	done	3m	backend scaffold created, uvicorn starts clean, swagger docs verified
+1.2	b0d686b	done	3m	workspace CRUD endpoints working, all curl checks passed
+1.3	ae1e1ac	done	3m	file CRUD + content endpoints working, all curl checks passed
+1.4	4c9b94d	done	3m	batch import from path + multipart upload working
+1.5	d044bf6	done	2m	integration test script passes 18/18 checks

@@ -2,11 +2,11 @@
 
 ## Phase 1 - Backend API
 
-- [ ] 1.1 Backend scaffold
-- [ ] 1.2 Workspace endpoints
-- [ ] 1.3 File endpoints
-- [ ] 1.4 Batch import endpoints
-- [ ] 1.5 Backend integration test
+- [x] 1.1 Backend scaffold
+- [x] 1.2 Workspace endpoints
+- [x] 1.3 File endpoints
+- [x] 1.4 Batch import endpoints
+- [x] 1.5 Backend integration test
 
 ## Phase 2 - Frontend App
 
