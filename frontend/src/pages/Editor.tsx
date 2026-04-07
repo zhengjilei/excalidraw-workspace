@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Excalidraw } from '@excalidraw/excalidraw';
-import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
-import type { AppState } from '@excalidraw/excalidraw/types/types';
 import { getFile, getFileContent, saveFileContent, renameFile } from '../api/client';
 import type { ExcalidrawFile } from '../api/types';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ExcalidrawElement = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AppState = any;
 
 const SAVE_KEYS = ['viewBackgroundColor', 'gridSize', 'gridStep', 'gridModeEnabled'];
 
