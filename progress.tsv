@@ -4,3 +4,8 @@ task_id	commit	status	duration	notes
 1.3	ae1e1ac	done	3m	file CRUD + content endpoints working, all curl checks passed
 1.4	4c9b94d	done	3m	batch import from path + multipart upload working
 1.5	d044bf6	done	2m	integration test script passes 18/18 checks
+2.1	ff0bf7e	done	3m	frontend scaffold with routing, API client, placeholder pages
+2.2	c750b48	done	3m	dashboard page with workspace cards, create modal, rename/delete
+2.3	278398c	done	3m	workspace view with file cards, import modal, new drawing
+2.4	cb148a7	done	4m	editor page with Excalidraw, auto-save debounced 1.5s, inline rename
+2.5	5739c0c	done	3m	frontend integration test 10/10 checks pass, build succeeds

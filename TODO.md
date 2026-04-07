@@ -10,11 +10,11 @@
 
 ## Phase 2 - Frontend App
 
-- [ ] 2.1 Frontend scaffold
-- [ ] 2.2 Dashboard page
-- [ ] 2.3 WorkspaceView page
-- [ ] 2.4 Editor page
-- [ ] 2.5 Frontend integration test
+- [x] 2.1 Frontend scaffold
+- [x] 2.2 Dashboard page
+- [x] 2.3 WorkspaceView page
+- [x] 2.4 Editor page
+- [x] 2.5 Frontend integration test
 
 ## Phase 3 - Docker Compose
 
