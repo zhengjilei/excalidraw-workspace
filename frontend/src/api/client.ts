@@ -45,6 +45,20 @@ export const saveFileContent = (wid: string, fid: string, data: Record<string, u
     body: JSON.stringify(data),
   });
 
+// Move/Copy
+export const copyFile = (wid: string, fid: string, targetWid: string) =>
+  request<ExcalidrawFile>(`/api/workspaces/${wid}/files/${fid}/copy`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target_workspace_id: targetWid }),
+  });
+export const moveFile = (wid: string, fid: string, targetWid: string) =>
+  request<ExcalidrawFile>(`/api/workspaces/${wid}/files/${fid}/move`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ target_workspace_id: targetWid }),
+  });
+
 // Import
 export const uploadFiles = (wid: string, files: File[]) => {
   const form = new FormData();

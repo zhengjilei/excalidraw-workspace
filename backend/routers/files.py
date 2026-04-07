@@ -21,6 +21,10 @@ class ImportRequest(BaseModel):
     path: str
     recursive: bool = False
 
+
+class MoveOrCopyRequest(BaseModel):
+    target_workspace_id: str
+
 EMPTY_SCENE = {"type": "excalidraw", "version": 2, "elements": [], "appState": {}}
 
 
@@ -106,6 +110,42 @@ def delete_file(wid: str, fid: str, db: Session = Depends(get_db)):
     db.delete(file)
     db.commit()
     return None
+
+
+@router.post("/files/{fid}/copy", response_model=FileResponse, status_code=201)
+def copy_file(wid: str, fid: str, body: MoveOrCopyRequest, db: Session = Depends(get_db)):
+    _get_workspace_or_404(wid, db)
+    source_file = _get_file_or_404(fid, wid, db)
+    target_ws = db.query(Workspace).filter(Workspace.id == body.target_workspace_id).first()
+    if not target_ws:
+        raise HTTPException(status_code=404, detail="Target workspace not found")
+    source_path = _file_path(wid, fid)
+    content = read_file(source_path)
+    new_id = str(uuid.uuid4())
+    new_file = File(id=new_id, workspace_id=body.target_workspace_id, name=source_file.name)
+    db.add(new_file)
+    db.commit()
+    db.refresh(new_file)
+    write_file(_file_path(body.target_workspace_id, new_id), content)
+    return new_file
+
+
+@router.post("/files/{fid}/move", response_model=FileResponse)
+def move_file(wid: str, fid: str, body: MoveOrCopyRequest, db: Session = Depends(get_db)):
+    _get_workspace_or_404(wid, db)
+    file = _get_file_or_404(fid, wid, db)
+    target_ws = db.query(Workspace).filter(Workspace.id == body.target_workspace_id).first()
+    if not target_ws:
+        raise HTTPException(status_code=404, detail="Target workspace not found")
+    source_path = _file_path(wid, fid)
+    content = read_file(source_path)
+    write_file(_file_path(body.target_workspace_id, fid), content)
+    delete_file_from_disk(source_path)
+    file.workspace_id = body.target_workspace_id
+    file.updated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(file)
+    return file
 
 
 @router.post("/import")

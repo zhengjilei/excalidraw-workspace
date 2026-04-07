@@ -62,7 +62,7 @@ export default function WorkspaceView() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
           {files.filter((f) => f.name.toLowerCase().includes(search.toLowerCase())).map((f) => (
-            <FileCard key={f.id} file={f} onRename={handleRename} onDelete={handleDelete} />
+            <FileCard key={f.id} file={f} onRename={handleRename} onDelete={handleDelete} onRefresh={load} />
           ))}
         </div>
         {files.length === 0 && (
