@@ -11,6 +11,7 @@ export default function WorkspaceView() {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [files, setFiles] = useState<ExcalidrawFile[]>([]);
   const [showImport, setShowImport] = useState(false);
+  const [search, setSearch] = useState('');
 
   const load = () => {
     if (!workspaceId) return;
@@ -51,8 +52,16 @@ export default function WorkspaceView() {
             <button style={primaryBtn} onClick={handleNew}>+ New Drawing</button>
           </div>
         </div>
+        <div style={{ marginBottom: 16 }}>
+          <input
+            style={searchInput}
+            placeholder="Search files..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
-          {files.map((f) => (
+          {files.filter((f) => f.name.toLowerCase().includes(search.toLowerCase())).map((f) => (
             <FileCard key={f.id} file={f} onRename={handleRename} onDelete={handleDelete} />
           ))}
         </div>
@@ -74,4 +83,9 @@ const primaryBtn: React.CSSProperties = {
 const actionBtn: React.CSSProperties = {
   padding: '8px 16px', borderRadius: 4, border: '1px solid #555', background: 'transparent',
   color: '#ccc', cursor: 'pointer', fontSize: 14,
+};
+const searchInput: React.CSSProperties = {
+  width: '100%', maxWidth: 360, padding: '8px 12px', borderRadius: 4,
+  border: '1px solid #555', background: '#1a1a1a', color: '#eee',
+  fontSize: 14, boxSizing: 'border-box',
 };
