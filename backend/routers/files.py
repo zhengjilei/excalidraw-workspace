@@ -1,8 +1,10 @@
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from config import WORKSPACES_DIR
@@ -10,8 +12,14 @@ from main import get_db
 from models import Workspace, File
 from schemas import FileCreate, FileUpdate, FileResponse
 from services.storage import read_file, write_file, delete_file as delete_file_from_disk
+from services.importer import import_from_path, import_from_upload
 
-router = APIRouter(prefix="/api/workspaces/{wid}/files", tags=["files"])
+router = APIRouter(prefix="/api/workspaces/{wid}", tags=["files"])
+
+
+class ImportRequest(BaseModel):
+    path: str
+    recursive: bool = False
 
 EMPTY_SCENE = {"type": "excalidraw", "version": 2, "elements": [], "appState": {}}
 
@@ -34,7 +42,7 @@ def _file_path(wid: str, fid: str):
     return WORKSPACES_DIR / wid / f"{fid}.excalidraw"
 
 
-@router.post("", response_model=FileResponse, status_code=201)
+@router.post("/files", response_model=FileResponse, status_code=201)
 def create_file(wid: str, body: FileCreate, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     file = File(id=str(uuid.uuid4()), workspace_id=wid, name=body.name)
@@ -45,19 +53,19 @@ def create_file(wid: str, body: FileCreate, db: Session = Depends(get_db)):
     return file
 
 
-@router.get("", response_model=list[FileResponse])
+@router.get("/files", response_model=list[FileResponse])
 def list_files(wid: str, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     return db.query(File).filter(File.workspace_id == wid).all()
 
 
-@router.get("/{fid}", response_model=FileResponse)
+@router.get("/files/{fid}", response_model=FileResponse)
 def get_file(wid: str, fid: str, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     return _get_file_or_404(fid, wid, db)
 
 
-@router.get("/{fid}/content")
+@router.get("/files/{fid}/content")
 def get_file_content(wid: str, fid: str, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     _get_file_or_404(fid, wid, db)
@@ -68,7 +76,7 @@ def get_file_content(wid: str, fid: str, db: Session = Depends(get_db)):
     return JSONResponse(content=data)
 
 
-@router.put("/{fid}/content")
+@router.put("/files/{fid}/content")
 async def save_file_content(wid: str, fid: str, request: Request, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     file = _get_file_or_404(fid, wid, db)
@@ -79,7 +87,7 @@ async def save_file_content(wid: str, fid: str, request: Request, db: Session = 
     return {"status": "ok"}
 
 
-@router.put("/{fid}", response_model=FileResponse)
+@router.put("/files/{fid}", response_model=FileResponse)
 def rename_file(wid: str, fid: str, body: FileUpdate, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     file = _get_file_or_404(fid, wid, db)
@@ -90,7 +98,7 @@ def rename_file(wid: str, fid: str, body: FileUpdate, db: Session = Depends(get_
     return file
 
 
-@router.delete("/{fid}", status_code=204)
+@router.delete("/files/{fid}", status_code=204)
 def delete_file(wid: str, fid: str, db: Session = Depends(get_db)):
     _get_workspace_or_404(wid, db)
     file = _get_file_or_404(fid, wid, db)
@@ -98,3 +106,17 @@ def delete_file(wid: str, fid: str, db: Session = Depends(get_db)):
     db.delete(file)
     db.commit()
     return None
+
+
+@router.post("/import")
+def import_files(wid: str, body: ImportRequest, db: Session = Depends(get_db)):
+    _get_workspace_or_404(wid, db)
+    result = import_from_path(body.path, wid, db, body.recursive)
+    return result
+
+
+@router.post("/upload")
+async def upload_files(wid: str, files: list[UploadFile], db: Session = Depends(get_db)):
+    _get_workspace_or_404(wid, db)
+    result = await import_from_upload(files, wid, db)
+    return result
