@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Excalidraw, exportToSvg, exportToBlob } from '@excalidraw/excalidraw';
+import '@excalidraw/excalidraw/index.css';
 import { getFile, getFileContent, saveFileContent, renameFile } from '../api/client';
 import type { ExcalidrawFile } from '../api/types';
 
